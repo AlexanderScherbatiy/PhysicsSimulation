@@ -72,6 +72,8 @@ public class PlanetarySystemSample extends Application {
         space.addBody(body1);
         space.addBody(body2);
 
+        space.evaluate();
+
         return space;
     }
 
