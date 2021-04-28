@@ -9,10 +9,11 @@ import java.util.List;
 
 public class NewtonSpace {
 
+    private static final double G = 6.67e-11;
+    private static final double DELTA_T = 200;
+
     private VectorSpace vectorSpace;
     private List<NewtonSpaceBody> bodies = new LinkedList<>();
-    private static final double G = 0.01;
-    private static final double DELTA_T = 0.01;
 
     public NewtonSpace(VectorSpace vectorSpace) {
         this.vectorSpace = vectorSpace;
@@ -42,7 +43,7 @@ public class NewtonSpace {
                 double length = ops.length(deltaR);
 
                 Vector velocity = body2.getVelocity();
-                Vector acceleration = ops.multiply(G * body1.getMass() / (length * length * length), deltaR);
+                Vector acceleration = ops.multiply(-G * body1.getMass() / (length * length * length), deltaR);
                 Vector dv = ops.multiply(DELTA_T, acceleration);
                 ops.updateAdd(velocity, dv);
 

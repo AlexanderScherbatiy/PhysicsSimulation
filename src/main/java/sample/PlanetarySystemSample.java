@@ -1,5 +1,8 @@
 package sample;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -8,6 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import physics.newton.NewtonSpace;
 import physics.newton.NewtonSpaceBody;
 import physics.vector.memory.MemoryVectorSpace3D;
@@ -20,19 +24,19 @@ import java.util.stream.Collectors;
 
 public class PlanetarySystemSample extends Application {
 
-    private static final int STAGE_WIDTH = 800;
-    private static final int STAGE_HEIGHT = 600;
+    private static final int STAGE_WIDTH = 1000;
+    private static final int STAGE_HEIGHT = 800;
 
-    private static final double RADIUS_SCALE = 0.1;
-    private static final double POSITION_SCALE = 1;
+    private static final double POSITION_SCALE = 3e-9;
+    private static final double RADIUS_SCALE = 100 * POSITION_SCALE;
 
     @Override
     public void start(Stage stage) {
 
         NewtonSpace space = createSpace();
 
-        List<Node> nodes = createShapes(space);
-
+        List<BodyShape> shapes = createShapes(space);
+        List<Node> nodes = shapes.stream().map(shape -> shape.circle).collect(Collectors.toList());
         Group root = new Group(nodes);
 
         double tx = STAGE_WIDTH / 2;
@@ -47,6 +51,8 @@ public class PlanetarySystemSample extends Application {
         stage.setWidth(STAGE_WIDTH);
         stage.setHeight(STAGE_HEIGHT);
         stage.show();
+
+        runAnimation(space, shapes);
     }
 
     private static NewtonSpace createSpace() {
@@ -55,48 +61,81 @@ public class PlanetarySystemSample extends Application {
         NewtonSpace space = new NewtonSpace(vectorSpace);
 
         VectorFactory vectorFactory = vectorSpace.getFactory();
-        double R = 100;
-        Vector position1 = vectorFactory.createVector3D(R, 0, 0);
-        Vector position2 = vectorFactory.createVector3D(-R, 0, 0);
+        Vector sunPosition = vectorFactory.createVector3D(0, 0, 0);
 
-        double velocity = 200;
-        Vector velocity1 = vectorFactory.createVector3D(0, velocity, 0);
-        Vector velocity2 = vectorFactory.createVector3D(0, -velocity, 0);
+        double R = 150e9;
+        Vector earthPosition = vectorFactory.createVector3D(R, 0, 0);
 
-        double mass = 100;
-        double radius = 100;
+        Vector sunVelocity = vectorFactory.createVector3D(0, 0, 0);
 
-        NewtonSpaceBody body1 = new NewtonSpaceBody(mass, radius, position1, velocity1);
-        NewtonSpaceBody body2 = new NewtonSpaceBody(mass, radius, position2, velocity2);
+        double velocity = 30e3;
+        Vector earthVelocity = vectorFactory.createVector3D(0, velocity, 0);
+
+        double sunMass = 2e30;
+        double earthMass = 6e24;
+
+        double sunRadius = 696e6;
+        double earthRadius = 6.3e6;
+
+        NewtonSpaceBody body1 = new NewtonSpaceBody(sunMass, sunRadius, sunPosition, sunVelocity);
+        NewtonSpaceBody body2 = new NewtonSpaceBody(earthMass, earthRadius, earthPosition, earthVelocity);
 
         space.addBody(body1);
         space.addBody(body2);
 
-        space.evaluate();
-
         return space;
     }
 
-    List<Node> createShapes(NewtonSpace space) {
+    private static void runAnimation(NewtonSpace space, List<BodyShape> shapes) {
 
-        return space.getBodies().stream().map(body -> {
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(Animation.INDEFINITE);
 
-            final VectorSpace vectorSpace = space.getVectorSpace();
-            Vector position = body.getCoordinates();
-            double x = vectorSpace.getOperations().getValue(0, position);
-            double y = vectorSpace.getOperations().getValue(1, position);
+        KeyFrame evaluationFrame = new KeyFrame(Duration.seconds(0.0001), (event) -> {
+            space.evaluate();
+            shapes.stream().forEach(shape -> {
+                shape.update();
+            });
+        });
 
-            Circle circle = new Circle();
-            circle.setRadius(body.getRadius() * RADIUS_SCALE);
-            circle.setCenterX(x * POSITION_SCALE);
-            circle.setCenterY(y * POSITION_SCALE);
-            circle.setFill(x > 0 ? Color.GREEN : Color.ORANGE);
-            return circle;
+        timeline.getKeyFrames().add(evaluationFrame);
+        timeline.play();
+    }
 
-        }).collect(Collectors.toList());
+    List<BodyShape> createShapes(NewtonSpace space) {
+
+        return space
+                .getBodies()
+                .stream()
+                .map(body -> new BodyShape(space, body))
+                .collect(Collectors.toList());
     }
 
     public static void main(String args[]) {
         launch(args);
+    }
+
+    private static class BodyShape {
+
+        private final Circle circle;
+        private final NewtonSpace space;
+        private final NewtonSpaceBody body;
+
+        public BodyShape(NewtonSpace space, NewtonSpaceBody body) {
+            this.space = space;
+            this.body = body;
+            this.circle = new Circle();
+            circle.setRadius(body.getRadius() * RADIUS_SCALE);
+            circle.setFill(Color.ORANGE);
+        }
+
+        public void update() {
+            final VectorSpace vectorSpace = space.getVectorSpace();
+            Vector position = body.getCoordinates();
+            double x = vectorSpace.getOperations().getValue(0, position);
+            double y = vectorSpace.getOperations().getValue(1, position);
+            circle.setCenterX(x * POSITION_SCALE);
+            circle.setCenterY(y * POSITION_SCALE);
+        }
     }
 }
