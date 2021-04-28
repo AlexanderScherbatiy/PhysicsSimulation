@@ -28,7 +28,8 @@ public class PlanetarySystemSample extends Application {
     private static final int STAGE_HEIGHT = 800;
 
     private static final double POSITION_SCALE = 3e-9;
-    private static final double RADIUS_SCALE = 100 * POSITION_SCALE;
+
+    private static final String PROP_RADIUS_SCALE = "planetary_system.radius.scale";
 
     @Override
     public void start(Stage stage) {
@@ -77,11 +78,14 @@ public class PlanetarySystemSample extends Application {
         double sunRadius = 696e6;
         double earthRadius = 6.3e6;
 
-        NewtonSpaceBody body1 = new NewtonSpaceBody(sunMass, sunRadius, sunPosition, sunVelocity);
-        NewtonSpaceBody body2 = new NewtonSpaceBody(earthMass, earthRadius, earthPosition, earthVelocity);
+        NewtonSpaceBody sun = new NewtonSpaceBody(sunMass, sunRadius, sunPosition, sunVelocity);
+        NewtonSpaceBody earth = new NewtonSpaceBody(earthMass, earthRadius, earthPosition, earthVelocity);
 
-        space.addBody(body1);
-        space.addBody(body2);
+        sun.putProperty(PROP_RADIUS_SCALE, 30.0 * POSITION_SCALE);
+        earth.putProperty(PROP_RADIUS_SCALE, 300.0 * POSITION_SCALE);
+
+        space.addBody(sun);
+        space.addBody(earth);
 
         return space;
     }
@@ -125,7 +129,8 @@ public class PlanetarySystemSample extends Application {
             this.space = space;
             this.body = body;
             this.circle = new Circle();
-            circle.setRadius(body.getRadius() * RADIUS_SCALE);
+            double radiusScale = (double) body.getProperty(PROP_RADIUS_SCALE);
+            circle.setRadius(body.getRadius() * radiusScale);
             circle.setFill(Color.ORANGE);
         }
 
