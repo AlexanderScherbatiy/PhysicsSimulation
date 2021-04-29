@@ -12,5 +12,5 @@ public interface VectorOperations {
 
     double length(Vector vector);
 
-    void updateAdd(Vector accumulator, Vector vector);
+    void updateAdd(VariableVector accumulator, Vector vector);
 }

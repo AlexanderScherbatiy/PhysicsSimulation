@@ -1,9 +1,10 @@
 package physics.vector.memory;
 
 import physics.vector.Vector;
+import physics.vector.VectorSpace;
 import physics.vector.VectorFactory;
 import physics.vector.VectorOperations;
-import physics.vector.VectorSpace;
+import physics.vector.VariableVector;
 
 public class MemoryVectorSpace3D implements VectorSpace {
 
@@ -20,7 +21,7 @@ public class MemoryVectorSpace3D implements VectorSpace {
         return operations;
     }
 
-    private static class MemoryVector3D implements Vector {
+    private static class MemoryVector3D implements VariableVector {
 
         private double x;
         private double y;
@@ -41,7 +42,7 @@ public class MemoryVectorSpace3D implements VectorSpace {
     private static class MemoryVectorFactory3D implements VectorFactory {
 
         @Override
-        public Vector createVector3D(double x, double y, double z) {
+        public VariableVector createVector3D(double x, double y, double z) {
             return new MemoryVector3D(x, y, z);
         }
     }
@@ -68,7 +69,7 @@ public class MemoryVectorSpace3D implements VectorSpace {
         }
 
         @Override
-        public void updateAdd(Vector vector2, Vector vector1) {
+        public void updateAdd(VariableVector vector2, Vector vector1) {
             MemoryVector3D m2 = castVector(vector2);
             MemoryVector3D m1 = castVector(vector1);
             m2.x += m1.x;

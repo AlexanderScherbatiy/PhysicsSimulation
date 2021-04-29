@@ -14,6 +14,7 @@ import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import physics.newton.NewtonSpace;
 import physics.newton.NewtonSpaceBody;
+import physics.vector.VariableVector;
 import physics.vector.memory.MemoryVectorSpace3D;
 import physics.vector.Vector;
 import physics.vector.VectorFactory;
@@ -62,15 +63,15 @@ public class PlanetarySystemSample extends Application {
         NewtonSpace space = new NewtonSpace(vectorSpace);
 
         VectorFactory vectorFactory = vectorSpace.getFactory();
-        Vector sunPosition = vectorFactory.createVector3D(0, 0, 0);
+        VariableVector sunPosition = vectorFactory.createVector3D(0, 0, 0);
 
         double R = 150e9;
-        Vector earthPosition = vectorFactory.createVector3D(R, 0, 0);
+        VariableVector earthPosition = vectorFactory.createVector3D(R, 0, 0);
 
-        Vector sunVelocity = vectorFactory.createVector3D(0, 0, 0);
+        VariableVector sunVelocity = vectorFactory.createVector3D(0, 0, 0);
 
         double velocity = 30e3;
-        Vector earthVelocity = vectorFactory.createVector3D(0, velocity, 0);
+        VariableVector earthVelocity = vectorFactory.createVector3D(0, velocity, 0);
 
         double sunMass = 2e30;
         double earthMass = 6e24;

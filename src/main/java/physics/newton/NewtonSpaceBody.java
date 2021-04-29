@@ -1,19 +1,19 @@
 package physics.newton;
 
-import java.util.Map;
-import java.util.HashMap;
+import physics.vector.VariableVector;
 
-import physics.vector.Vector;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NewtonSpaceBody {
 
     private double mass;
     private double radius;
-    private Vector coordinates;
-    private Vector velocity;
+    private VariableVector coordinates;
+    private VariableVector velocity;
     private Map<String, Object> properties;
 
-    public NewtonSpaceBody(double mass, double radius, Vector coordinates, Vector velocity) {
+    public NewtonSpaceBody(double mass, double radius, VariableVector coordinates, VariableVector velocity) {
         this.mass = mass;
         this.radius = radius;
         this.coordinates = coordinates;
@@ -28,11 +28,11 @@ public class NewtonSpaceBody {
         return radius;
     }
 
-    public Vector getCoordinates() {
+    public VariableVector getCoordinates() {
         return coordinates;
     }
 
-    public Vector getVelocity() {
+    public VariableVector getVelocity() {
         return velocity;
     }
 
@@ -48,5 +48,4 @@ public class NewtonSpaceBody {
     public Object getProperty(String key) {
         return properties == null ? null : properties.get(key);
     }
-
 }

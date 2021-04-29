@@ -3,6 +3,7 @@ package physics.newton;
 import physics.vector.Vector;
 import physics.vector.VectorOperations;
 import physics.vector.VectorSpace;
+import physics.vector.VariableVector;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -42,12 +43,12 @@ public class NewtonSpace {
                 Vector deltaR = ops.subtract(body2.getCoordinates(), body1.getCoordinates());
                 double length = ops.length(deltaR);
 
-                Vector velocity = body2.getVelocity();
+                VariableVector velocity = body2.getVelocity();
                 Vector acceleration = ops.multiply(-G * body1.getMass() / (length * length * length), deltaR);
                 Vector dv = ops.multiply(DELTA_T, acceleration);
                 ops.updateAdd(velocity, dv);
 
-                Vector coordinates = body2.getCoordinates();
+                VariableVector coordinates = body2.getCoordinates();
                 Vector dr = ops.multiply(DELTA_T, velocity);
                 ops.updateAdd(coordinates, dr);
             }
